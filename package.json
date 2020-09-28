@@ -1,0 +1,28 @@
+{
+  "name": "mon_mariage_en_ligne",
+  "version": "1.0.0",
+  "description": "",
+  "main": "/api/index.js",
+  "scripts": {
+    "start": "nodemon /api/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/leonardo75018/mon_mariage_en_ligne.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/leonardo75018/mon_mariage_en_ligne/issues"
+  },
+  "homepage": "https://github.com/leonardo75018/mon_mariage_en_ligne#readme",
+  "dependencies": {
+    "bcrypt": "^5.0.0",
+    "body-parser": "^1.19.0",
+    "jsonwebtoken": "^8.5.1",
+    "mysql": "^2.18.1",
+    "mysql2": "^2.2.2",
+    "path": "^0.12.7",
+    "sequelize": "^6.3.5"
+  }
+}
