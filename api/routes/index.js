@@ -1,13 +1,16 @@
 const bodyParser = require("body-parser")
-const findUsers = require("./usersRoute")
-const createUser = require("./createUser")
-const authentification = require("./authentification")
+const adminRoutes = require("./adminRoutes")
+const clienRoutes = require("./clienRoutes.js")
+const imageRoute = require("./imageRoute")
 
+
+const authentification = require("./authentification")
 
 module.exports = app => {
     app.use(bodyParser.json())
-    app.use(createUser)
-    app.use(findUsers)
-    app.use(authentification)
+    app.use(adminRoutes)
+    app.use(clienRoutes)
+    app.use(imageRoute)
+
 
 }

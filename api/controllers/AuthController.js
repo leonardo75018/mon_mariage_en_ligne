@@ -1,5 +1,4 @@
 const database = require("../models");
-const UserControllers = require("./UserControllers");
 const token = require("../functions/GenerateToke")
 
 
@@ -11,17 +10,14 @@ class AuthController {
 
         const { email, password } = req.body;
         try {
-            const user = await database.User.findOne({
+            const user = await database.Admin.findOne({
                 where: {
                     email: email,
                     password: password
                 }
             })
 
-            return res.status(200).send({
-                user,
-                GenerateToke: token({ id: user.id })
-            })
+            return res.status(200).send(user)
 
 
 
