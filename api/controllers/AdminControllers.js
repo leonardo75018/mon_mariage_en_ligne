@@ -1,6 +1,8 @@
 const database = require("../models")
 const token = require("../functions/GenerateToke")
 const bcrypt = require("bcrypt")
+const passport = require("passport")
+
 
 //Constante 
 const EMAIL_REGEX = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -103,20 +105,28 @@ class AdminControllers {
         }
     }
 
-    //Login
-    static async AdminLogin(req, res) {
+
+
+    //token
+    static async AdminLogin(req, res, next) {
         const { email, password } = req.body;
 
         try {
-            const userFound = await database.Admin.findOne({ where: { email: email } })
 
+            const userFound = await database.Admin.findOne({ where: { email: email } })
             if (!userFound)
                 return res.status(400).send({ error: "User not found" })
 
             if (!await bcrypt.compare(password, userFound.password))
                 return res.status(400).send({ error: "invalid password" })
 
-            return res.status(200).json(userFound)
+            userFound.password = undefined;
+
+            return res.status(200).json({
+                userFound,
+                GenerateToken: token({ id: userFound.id })
+            })
+
 
         } catch (err) {
             return res.status(500).json(err.message)
@@ -125,5 +135,6 @@ class AdminControllers {
     }
 
 }
+
 module.exports = AdminControllers;
 
