@@ -1,21 +1,7 @@
 const database = require("../models")
-const token = require("../functions/GenerateToke")
+const generateToken = require("../functions/GenerateToke")
 const bcrypt = require("bcrypt")
 const passport = require("passport")
-
-
-
-//JWT
-const jwt = require("jsonwebtoken");
-function createTokenJWT(user) {
-    const payload = {
-        id: user.id
-    };
-
-    const token = jwt.sign(payload, process.env.key_JWT);
-    return token;
-
-}
 
 
 //Constante 
@@ -24,13 +10,11 @@ const PASSWORD_REGEX = /^(?=.*\d).{4,8}$/;
 
 
 
-
-
-
 class AdminControllers {
 
     //Création d'un compte admin
     static async createAdmin(req, res) {
+
         const { role, profile, firstName, lastName, email, password } = req.body
         const bcryptHash = await bcrypt.hash(password, 5);
 
@@ -72,10 +56,12 @@ class AdminControllers {
                 email: email,
                 password: bcryptHash
             })
+
             return res.status(200).json({
                 admin,
                 GenerateToken: token({ id: admin.id })
             })
+
 
         } catch (err) {
             return res.status(500).json(err.message)
@@ -85,6 +71,7 @@ class AdminControllers {
 
     static async takeAllAdmin(req, res) {
         try {
+
             const allAdmin = await database.Admin.findAll()
             return res.status(200).json({ allAdmin, id: req.userId })
 
@@ -93,6 +80,7 @@ class AdminControllers {
 
         }
     }
+
 
 
     static async actualiserAdmin(req, res) {
@@ -123,17 +111,23 @@ class AdminControllers {
         }
     }
 
-
-
     //token au moment du login 
-    static async AdminLogin(req, res, next) {
-
-
+    static async AdminLogin(req, res) {
+        const { email } = req.body;
         try {
-            const token = createTokenJWT(req.user);
-            res.set("Authorization", token);
-            res.status(204).send();
+            const user = await database.Admin.findOne({
+                where: {
+                    email: email
+                }
+            })
 
+            user.password = undefined;
+            const token = generateToken({ id: user.id })
+            res.set("Authorization", token);
+            return res.send({
+                user,
+                token: generateToken({ id: user.id })
+            });
 
 
         } catch (err) {
@@ -143,6 +137,5 @@ class AdminControllers {
     }
 
 }
-
 module.exports = AdminControllers;
 

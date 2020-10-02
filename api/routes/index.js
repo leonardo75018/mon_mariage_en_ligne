@@ -4,7 +4,6 @@ const clienRoutes = require("./clienRoutes.js")
 const imageRoute = require("./imageRoute")
 
 
-const authentification = require("./authentification")
 
 module.exports = app => {
     app.use(bodyParser.json())

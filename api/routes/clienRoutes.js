@@ -1,12 +1,23 @@
 const { Router } = require("express")
 const ClientControllers = require("../controllers/ClientControllers")
+const imageControllers = require("../controllers/imageControllers")
 const auth = require("../middleware/auth")
+const passport = require("passport")
+const isAdmin = require("../middleware/isAdmin")
+
 
 const router = Router();
 
-router.post("/application/register/client", ClientControllers.createClient)
-router.get("/application/find/client", auth, ClientControllers.takeAllClients)
-router.post("/application/deleteClient/:id", ClientControllers.deleteClient)
+
+
+
+//login  //find les photos 
+router.post("/application/client/login", passport.authenticate("local.client"), ClientControllers.clientLogin)
+router.get("/application/client/accueil", auth, isAdmin, imageControllers.ImagesClient)
+
+
+//télécharger toules les photos
+//télécharger une photo
 router.put("/application/actualiserClient/:id", ClientControllers.actualiserClient)
 
 
