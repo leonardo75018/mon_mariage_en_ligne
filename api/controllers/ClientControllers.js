@@ -18,8 +18,6 @@ class ClientControllers {
         const { role, profile, firstName, lastName, email, telephoe, password } = req.body
         const bcryptHash = await bcrypt.hash(password, 5);
 
-
-
         try {
 
             if (firstName === null || firstName === undefined || firstName === '') {
@@ -43,14 +41,14 @@ class ClientControllers {
             }
 
 
-            if (await database.client.findOne({
+            if (await database.Client.findOne({
                 where: {
                     email: email
                 }
             }))
                 return res.status(400).send("Cette adresse e-mail est déjà utilisée. Si c'est la votre veillez vous connectez ")
 
-            const client = await database.client.create({
+            const client = await database.Client.create({
                 role: role,
                 profile: profile,
                 firstName: firstName,
@@ -72,50 +70,9 @@ class ClientControllers {
         }
     }
 
-    static async clientLogin(req, res) {
-        const { email, password } = req.body;
-
-        try {
-
-            const client = await database.client.findOne({
-                where: {
-                    email: email,
-                }
-            })
-
-            const mesPhotos = await database.image.findAll({ where: { idClient: req.user._previousDataValues.id } })
-
-
-            client.password = undefined;
-            const token = GenerateToken({ id: client.id })
-            res.set("Authorization", token);
-
-
-
-            return res.send({
-                client,
-                token,
-                mesPhotos
-
-            });
-
-
-
-
-
-        } catch (err) {
-            return res.status(500).json(err.message)
-
-        }
-    }
-
-
-
-
-
     static async takeAllClients(req, res) {
         try {
-            const allClients = await database.client.findAll()
+            const allClients = await database.Client.findAll()
             return res.status(200).json({ allClients, id: req.userId })
 
         } catch (err) {
@@ -130,34 +87,49 @@ class ClientControllers {
         const newInfos = req.body
         const { id } = req.params
         try {
-            await database.client.update(newInfos, { where: { id: Number(id) } })
-            const clientActualiser = await database.client.findOne({
+            await database.Client.update(newInfos, { where: { id: Number(id) } })
+            const clientActualiser = await database.Client.findOne({
                 where: { id: Number(id) }
             })
             return res.status(200).json(clientActualiser)
 
-
-
         } catch (err) {
             return res.status(500).json(err.message)
-
         }
     }
 
     static async deleteClient(req, res) {
         const { id } = req.params
         try {
-            await database.client.destroy({
+            await database.Client.destroy({
                 where: { id: Number(id) }
             })
             return res.status(200).json({ message: `id ${id} deleted` })
 
-
-
         } catch (err) {
             return res.status(500).json(err.message)
-
         }
+    }
+
+    static async clientLogin(req, res) {
+        const { email, password } = req.body;
+
+        try {
+            const client = await database.Client.findOne({
+                where: { email: email, }
+            })
+            if (!client)
+                return res.status(400).send({ error: "User not found" })
+
+            if (!await bcrypt.compare(password, client.password))
+                return res.status(400).send({ erro: "Invalid password" })
+
+            client.password = undefined;
+            const token = GenerateToken({ id: client.id })
+            res.set("Authorization", token);
+
+            return res.send({ client, token });
+        } catch (err) { return res.status(500).json(err.message) }
     }
 
 

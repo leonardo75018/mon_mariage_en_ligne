@@ -6,7 +6,7 @@ const database = require("../models")
 
 //Model
 const user = database.Admin;
-const client = database.client;
+const client = database.Client;
 
 
 
